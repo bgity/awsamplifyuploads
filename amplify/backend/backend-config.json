@@ -1,0 +1,12 @@
+{
+  "auth": {
+    "amplifytcsvideofd0fb61e": {
+      "service": "Cognito",
+      "serviceType": "imported",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [],
+      "customAuth": false
+    }
+  },
+  "storage": {}
+}
