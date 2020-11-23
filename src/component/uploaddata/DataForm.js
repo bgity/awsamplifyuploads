@@ -5,21 +5,19 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 class DataForm extends Component {
-  fileObj = [];
-  fileArray = [];
+  //fileObj = [];
+  //fileArray = [];
   constructor(props) {
     super(props);
     this.state = {
       videoName: '',
       videoFile: '',
       videoType: '',
-      response: '',
       isLoading: false,
       shortDescription: '',
       longDescription: '',
       category: '',
       subCategory: '',
-      videoNameVal: '',
       uploadProgress: 0,
       uploading: false,
       validated: false,
@@ -30,14 +28,15 @@ class DataForm extends Component {
       categoryError: false,
       subCategoryError: false,
       videoNameError: false,
-      files: [],
-      imageFiles: [null],
+      imageUploadError: false,
+      /* files: [],*/
+      imageFiles: '',
     };
   }
 
-  fileSelectedHandler = (e) => {
+  /* fileSelectedHandler = (e) => {
     this.setState({ imageFiles: [...this.state.files, ...e.target.files] });
-  };
+  }; */
 
   handleChangeValue = (event) => {
     if (event.target.name === 'shortDescription') {
@@ -88,6 +87,18 @@ class DataForm extends Component {
         });
       }
     }
+    if (event.target.name === 'assetImgUpload') {
+      if (event.target.files[0] === '' || event.target.files[0] === null) {
+        this.setState({
+          imageUploadError: true,
+        });
+      } else {
+        this.setState({
+          imageUploadError: false,
+          imageFiles: event.target.files[0],
+        });
+      }
+    }
   };
   handleVideoChangeValue = (event) => {
     const fileValue = event.target.files[0];
@@ -104,15 +115,16 @@ class DataForm extends Component {
       });
     }
   };
-  async pushImgToS3(uri, filename) {
+  /* async pushImgToS3(uri, filename) {
     if (uri === null) return;
     await Storage.put(filename, uri, {
       contentType: 'image/*',
     })
       .then((result) => console.log(result.key))
       .catch((err) => console.log(err));
-  }
-  uploadAssetData = async (e) => {
+  } */
+
+  uploadAssetData = (e) => {
     const {
       shortDescription,
       longDescription,
@@ -123,23 +135,22 @@ class DataForm extends Component {
       videoType,
       imageFiles,
     } = this.state;
-    console.log(imageFiles);
-    const filesLength = imageFiles.length;
-    console.log(filesLength);
+
+    //const filesLength = imageFiles.length;
+    //console.log(filesLength);
     // Loop through all selected files
-    for (let i = 0; i < filesLength; i++) {
-      const file = imageFiles[i];
-      const filename = file.name;
-      /* .toLowerCase()
+    //for (let i = 0; i < filesLength; i++) {
+    // const file = imageFiles[i];
+    // const filename = file.name;
+    /* .toLowerCase()
         .replace(/ /g, '-')
         .replace(/[^\w-]+/g, '');
       const fileExtension = file.name.split('.').pop(); */
-      // Define the image name
-      //let mainImgName = filename . fileExtension;
-      // Push the image to S3
-      await this.pushImgToS3(file, filename);
-    }
-    return false;
+    // Define the image name
+    //let mainImgName = filename . fileExtension;
+    // Push the image to S3
+    //await this.pushImgToS3(file, filename);
+    // }
     if (shortDescription === '') {
       this.setState({ shortDescriptionError: true });
     }
@@ -152,6 +163,9 @@ class DataForm extends Component {
     if (subCategory === '') {
       this.setState({ subCategoryError: true });
     }
+    if (imageFiles === '') {
+      this.setState({ imageUploadError: true });
+    }
     if (videoName === '') {
       this.setState({ videoNameError: true });
       return false;
@@ -160,80 +174,112 @@ class DataForm extends Component {
         videoNameError: false,
       });
     }
-
-    let videoNameStr = videoName.split('.')[0];
-    var createFileName = 'jsonuploader/jsonFile-' + videoNameStr + '.json';
-    let jsonData = JSON.stringify({
-      shortDescription: shortDescription,
-      longDescription: longDescription,
-      category: category,
-      subCategory: subCategory,
-      videoName: videoName,
-    });
-
-    //Json upload
-    Storage.put(`${createFileName}`, `${jsonData}`, {
-      customPrefix: {
-        public: '',
-      },
-      //bucket: 'asset-uploader-dev',
-    })
-      .then((result) => {
-        console.log('result: ', result);
-      })
-      .catch((err) => {
-        this.setState({
-          toster: true,
-        });
-        toast.error(`Cannot uploading file: ${err}`, {
-          position: 'top-right',
-          autoClose: 4000,
-        });
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+    if (
+      shortDescription != '' &&
+      longDescription !== '' &&
+      category !== '' &&
+      subCategory !== '' &&
+      videoName !== '' &&
+      imageFiles !== ''
+    ) {
+      let videoNameStr = videoName.split('.')[0];
+      let createJsonFile = 'jsonuploader/jsonFile-' + videoNameStr + '.json';
+      let imageType = imageFiles.type;
+      let imageName = imageFiles.name;
+      let jsonData = JSON.stringify({
+        shortDescription: shortDescription,
+        longDescription: longDescription,
+        category: category,
+        subCategory: subCategory,
+        videoName: videoName,
+        imageName: imageName,
       });
-    //Video Upload
-    const foo = this;
-    this.setState({ uploading: true });
-    Storage.put(`${videoName}`, videoFile, {
-      customPrefix: {
-        public: '',
-      },
-      progressCallback(progress) {
-        let prog = parseInt((progress.loaded / progress.total) * 100);
-        //console.log(prog + '%');
-        foo.setState({ uploadProgress: prog + '%' });
-      },
-      contentType: videoType,
-    })
-      .then((result) => {
-        this.setState({ uploading: false });
-        this.setState({
-          toster: true,
-        });
-        toast.success('File Uploaded Succesfully', {
-          position: 'top-right',
-          autoClose: 3000,
-        });
-        //document.getElementById('dataForm').reset();
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
+
+      //Json upload
+      Storage.put(`${createJsonFile}`, `${jsonData}`, {
+        customPrefix: {
+          public: '',
+        },
+        //bucket: 'asset-uploader-dev',
       })
-      .catch((err) => {
-        this.setState({
-          toster: true,
+        .then((result) => {
+          console.log('result: ', result);
+        })
+        .catch((err) => {
+          this.setState({
+            toster: true,
+          });
+          toast.error(`Cannot uploading file: ${err}`, {
+            position: 'top-right',
+            autoClose: 4000,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         });
-        toast.error(`Cannot uploading file: ${err}`, {
-          position: 'top-right',
-          autoClose: 3000,
+
+      //Image Upload
+      const foo = this;
+      Storage.put(`${'videoImages/' + imageName}`, imageType, {
+        customPrefix: {
+          public: '',
+        },
+        contentType: videoType,
+      })
+        .then((result) => {
+          console.log('result: ', result);
+        })
+        .catch((err) => {
+          this.setState({
+            toster: true,
+          });
+          toast.error(`Cannot uploading Image file: ${err} please try again`, {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
         });
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      });
-    //}
+      //Video Upload
+      this.setState({ uploading: true });
+      Storage.put(`${videoName}`, videoFile, {
+        customPrefix: {
+          public: '',
+        },
+        progressCallback(progress) {
+          let prog = parseInt((progress.loaded / progress.total) * 100);
+          //console.log(prog + '%');
+          foo.setState({ uploadProgress: prog + '%' });
+        },
+        contentType: videoType,
+      })
+        .then(() => {
+          this.setState({ uploading: false });
+          this.setState({
+            toster: true,
+          });
+          toast.success('File Uploaded Succesfully', {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        })
+        .catch((err) => {
+          this.setState({
+            toster: true,
+          });
+          toast.error(`Cannot uploading Video file: ${err} please try again`, {
+            position: 'top-right',
+            autoClose: 3000,
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        });
+    }
   };
   render() {
     return (
@@ -304,7 +350,7 @@ class DataForm extends Component {
                     ''
                   )}
                 </Form.Group>
-                <Form.Group as={Col} controlId='formGridPassword'>
+                <Form.Group as={Col}>
                   <Form.Label>Sub Category</Form.Label>
                   <Form.Control
                     as='select'
@@ -326,38 +372,57 @@ class DataForm extends Component {
                   )}
                 </Form.Group>
               </Form.Row>
-              <Form.Group>
-                <Form.Label>Video</Form.Label>
-                {this.state.uploading && (
-                  <div className='progress' style={{ marginBottom: '10px' }}>
-                    <div
-                      className='progress-bar'
-                      role='progressbar'
-                      style={{ width: this.state.uploadProgress }}
-                      aria-valuenow={this.state.uploadProgress}
-                      aria-valuemin='0'
-                      aria-valuemax='100'
-                    >
-                      {this.state.uploadProgress}
+              <Form.Row>
+                <Form.Group as={Col}>
+                  <Form.Label>Thumbnail Image</Form.Label>
+                  <Form.File
+                    name='assetImgUpload'
+                    type='file'
+                    accept='image/*'
+                    onChange={this.handleChangeValue}
+                    required
+                  />
+                  {this.state.imageUploadError ? (
+                    <span style={{ color: 'red' }}>
+                      Please Choose Image File For Upload
+                    </span>
+                  ) : (
+                    ''
+                  )}
+                </Form.Group>
+                <Form.Group as={Col}>
+                  <Form.Label>Video</Form.Label>
+                  {this.state.uploading && (
+                    <div className='progress' style={{ marginBottom: '10px' }}>
+                      <div
+                        className='progress-bar'
+                        role='progressbar'
+                        style={{ width: this.state.uploadProgress }}
+                        aria-valuenow={this.state.uploadProgress}
+                        aria-valuemin='0'
+                        aria-valuemax='100'
+                      >
+                        {this.state.uploadProgress}
+                      </div>
                     </div>
-                  </div>
-                )}
-                <Form.File
-                  name='assetUpload'
-                  type='file'
-                  accept='video/*'
-                  onChange={this.handleVideoChangeValue}
-                  required
-                />
-                {this.state.videoNameError ? (
-                  <span style={{ color: 'red' }}>
-                    Please Choose File For Upload
-                  </span>
-                ) : (
-                  ''
-                )}
-              </Form.Group>
-              <Form.Group>
+                  )}
+                  <Form.File
+                    name='assetVideoUpload'
+                    type='file'
+                    accept='video/*'
+                    onChange={this.handleVideoChangeValue}
+                    required
+                  />
+                  {this.state.videoNameError ? (
+                    <span style={{ color: 'red' }}>
+                      Please Choose Video File For Upload
+                    </span>
+                  ) : (
+                    ''
+                  )}
+                </Form.Group>
+              </Form.Row>
+              {/* <Form.Group>
                 <Form.Label>Image</Form.Label>
                 <Form.File
                   name='assetImgUpload'
@@ -366,7 +431,7 @@ class DataForm extends Component {
                   multiple={true}
                   onChange={this.fileSelectedHandler}
                 />
-              </Form.Group>
+              </Form.Group>*/}
               {this.state.toster && (
                 <ToastContainer
                   position='top-right'
@@ -380,7 +445,6 @@ class DataForm extends Component {
                   pauseOnHover
                 />
               )}
-              {/*  {this.state.toster && <Toster />} */}
               <Button variant='primary' onClick={this.uploadAssetData}>
                 Submit
               </Button>
