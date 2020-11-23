@@ -5,7 +5,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 class DataForm extends Component {
-  //timmer = () => {};
+  fileObj = [];
+  fileArray = [];
   constructor(props) {
     super(props);
     this.state = {
@@ -29,11 +30,16 @@ class DataForm extends Component {
       categoryError: false,
       subCategoryError: false,
       videoNameError: false,
+      files: [],
+      imageFiles: [null],
     };
   }
 
+  fileSelectedHandler = (e) => {
+    this.setState({ imageFiles: [...this.state.files, ...e.target.files] });
+  };
+
   handleChangeValue = (event) => {
-    const value = event.target.value;
     if (event.target.name === 'shortDescription') {
       if (event.target.value === '' || event.target.value === null) {
         this.setState({
@@ -98,7 +104,15 @@ class DataForm extends Component {
       });
     }
   };
-  uploadAssetData = (e) => {
+  async pushImgToS3(uri, filename) {
+    if (uri === null) return;
+    await Storage.put(filename, uri, {
+      contentType: 'image/*',
+    })
+      .then((result) => console.log(result.key))
+      .catch((err) => console.log(err));
+  }
+  uploadAssetData = async (e) => {
     const {
       shortDescription,
       longDescription,
@@ -107,8 +121,25 @@ class DataForm extends Component {
       videoName,
       videoFile,
       videoType,
+      imageFiles,
     } = this.state;
-
+    console.log(imageFiles);
+    const filesLength = imageFiles.length;
+    console.log(filesLength);
+    // Loop through all selected files
+    for (let i = 0; i < filesLength; i++) {
+      const file = imageFiles[i];
+      const filename = file.name;
+      /* .toLowerCase()
+        .replace(/ /g, '-')
+        .replace(/[^\w-]+/g, '');
+      const fileExtension = file.name.split('.').pop(); */
+      // Define the image name
+      //let mainImgName = filename . fileExtension;
+      // Push the image to S3
+      await this.pushImgToS3(file, filename);
+    }
+    return false;
     if (shortDescription === '') {
       this.setState({ shortDescriptionError: true });
     }
@@ -145,7 +176,7 @@ class DataForm extends Component {
       customPrefix: {
         public: '',
       },
-      bucket: 'asset-uploader-dev',
+      //bucket: 'asset-uploader-dev',
     })
       .then((result) => {
         console.log('result: ', result);
@@ -165,7 +196,7 @@ class DataForm extends Component {
     //Video Upload
     const foo = this;
     this.setState({ uploading: true });
-    Storage.put(`videouploader/${videoName}`, videoFile, {
+    Storage.put(`${videoName}`, videoFile, {
       customPrefix: {
         public: '',
       },
@@ -325,6 +356,16 @@ class DataForm extends Component {
                 ) : (
                   ''
                 )}
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Image</Form.Label>
+                <Form.File
+                  name='assetImgUpload'
+                  type='file'
+                  accept='image/*'
+                  multiple={true}
+                  onChange={this.fileSelectedHandler}
+                />
               </Form.Group>
               {this.state.toster && (
                 <ToastContainer
