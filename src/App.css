@@ -36,3 +36,67 @@
     transform: rotate(360deg);
   }
 }
+
+.top-padding {
+  margin-top: 150px;
+  margin-left: 25px;
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  .top-padding {
+    margin-top: 50px;
+    margin-left: 25px;
+  }
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  .top-padding {
+    margin-top: 50px;
+    margin-left: 25px;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  .top-padding {
+    margin-top: 70px;
+    margin-left: 25px;
+  }
+
+  .card-gardient {
+    width: 16rem !important;
+  }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  .top-padding {
+    margin-top: 150px;
+    margin-left: 25px;
+  }
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  .top-padding {
+    margin-top: 150px;
+    margin-left: 25px;
+  }
+}
+
+.card-gardient {
+  width: 18rem;
+  background: linear-gradient(to bottom, #1c7ce0, #150051);
+  height: 10rem;
+  border: 0px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+.text-middle {
+  margin-top: 45px;
+  /* font-weight: 300; */
+  /* font-size: 18px; */
+  margin-left: 42px;
+}

@@ -5,21 +5,18 @@
 body {
   min-height: 100vh;
   display: flex;
-  font-weight: 400;
+  /* font-weight: 400; */
   font-family: sans-serif;
-  background: #12c2e9; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #f64f59,
-    #c471ed,
-    #12c2e9
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to right,
-    #f64f59,
-    #c471ed,
-    #12c2e9
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  /*  background-image: linear-gradient(-5deg, #f64f59 5%, #c471ed 98%); */
+  background: linear-gradient(90deg, #0072ff 0%, #00d4ff 100%);
+  /* background: #12c2e9;
+  background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); 
+  background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9);
+  background-image: linear-gradient(
+    -111deg,
+    rgb(109, 36, 81) 5%,
+    rgb(149, 28, 34) 98%
+  );*/
 }
 
 body,
@@ -60,10 +57,16 @@ html,
 }
 
 .outer h3 {
+  /*  text-align: center;
+  margin: 0;
+  line-height: 1;
+  padding-bottom: 20px; */
   text-align: center;
   margin: 0;
   line-height: 1;
-  padding-bottom: 20px;
+  margin-top: -31px;
+  margin-bottom: 23px;
+  margin-left: 80px;
 }
 
 .custom-control-label {
@@ -86,4 +89,14 @@ html,
 }
 .Section__sectionFooterSecondaryContent___Nj41Q {
   display: none;
+}
+
+.Nav__navBar___xtCFA {
+  border: 0px !important;
+  border-color: none !important;
+  background-color: transparent !important;
+}
+
+.Nav__navItem___1LtFQ {
+  display: none !important;
 }

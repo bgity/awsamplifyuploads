@@ -3,8 +3,9 @@ import { Storage } from 'aws-amplify';
 import { Button, Col, Form } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { withRouter, Link } from 'react-router-dom';
 
-class DataForm extends Component {
+class VodUpload extends Component {
   //fileObj = [];
   //fileArray = [];
   constructor(props) {
@@ -100,6 +101,9 @@ class DataForm extends Component {
       }
     }
   };
+  backToDashboard = () => {
+    this.props.history.push('/');
+  };
   handleVideoChangeValue = (event) => {
     const fileValue = event.target.files[0];
     if (fileValue === '' || fileValue === null) {
@@ -175,7 +179,7 @@ class DataForm extends Component {
       });
     }
     if (
-      shortDescription != '' &&
+      shortDescription !== '' &&
       longDescription !== '' &&
       category !== '' &&
       subCategory !== '' &&
@@ -286,7 +290,10 @@ class DataForm extends Component {
       <div className='container'>
         <div className='outer'>
           <div className='inner'>
-            <h3>TCS VIDEO CHANNEL</h3>
+            <Button variant='primary' onClick={this.backToDashboard}>
+              Back
+            </Button>
+            <h3>VOD UPLOAD</h3>
             <Form
               validated={this.state.validated}
               onSubmit={this.uploadAssetData}
@@ -455,4 +462,4 @@ class DataForm extends Component {
     );
   }
 }
-export default DataForm;
+export default withRouter(VodUpload);
