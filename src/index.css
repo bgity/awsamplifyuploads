@@ -49,6 +49,7 @@ html,
   border-radius: 15px;
   transition: all 0.3s;
   margin-top: 45px;
+  margin-bottom: 35px;
 }
 
 .outer .form-control:focus {

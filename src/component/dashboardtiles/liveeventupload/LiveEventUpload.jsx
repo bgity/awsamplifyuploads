@@ -6,29 +6,22 @@ import 'react-toastify/dist/ReactToastify.css';
 import moment from 'moment';
 import { withRouter } from 'react-router-dom';
 
-class VodUpload extends Component {
+class LiveEventUpload extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      publishAsset: '',
-      title: '',
-      language: '',
-      videoName: '',
-      videoFile: '',
-      videoType: '',
-      response: '',
-      isLoading: false,
+      eventName: '',
+      eventFile: '',
+      eventType: '',
       shortDescription: '',
       longDescription: '',
       category: '',
       subCategory: '',
-      videoNameVal: '',
       uploadProgress: 0,
       uploading: false,
       validated: false,
       toster: false,
       //errors Var
-      titleError: false,
       shortDescriptionError: false,
       longDescriptionError: false,
       categoryError: false,
@@ -39,43 +32,8 @@ class VodUpload extends Component {
       username1: '',
     };
   }
-  componentDidMount() {
-    const getUserInformation = JSON.parse(
-      localStorage.getItem(
-        'CognitoIdentityServiceProvider.6475s2l40uo1i659uq0dbt6tf6.bp1.userData'
-      )
-    );
-    console.log(getUserInformation.Username);
-  }
   //Handle onchange event
   handleChangeValue = (event) => {
-    console.log(event.target.checked);
-    return false;
-    if (event.target.title === 'title') {
-      if (event.target.value === '' || event.target.value === null) {
-        this.setState({
-          titleError: true,
-        });
-      } else {
-        this.setState({
-          titleError: false,
-          title: event.target.value,
-        });
-      }
-    }
-    if (event.target.title === 'title') {
-      this.setState({
-        title: event.target.value,
-      });
-    }
-    if (event.target.publishAsset === 'publishAsset') {
-      let isChecked = event.target.checked;
-      console.log(isChecked);
-      this.setState({
-        publishAsset: event.target.value,
-      });
-    }
-
     if (event.target.name === 'shortDescription') {
       if (event.target.value === '' || event.target.value === null) {
         this.setState({
@@ -158,13 +116,19 @@ class VodUpload extends Component {
   };
   //Submit Form
   uploadAssetData = (e) => {
-    //Get Current User Login Information
     var data1 = localStorage.getItem(
       'CognitoIdentityServiceProvider.1gqmvf15e1ljdu60go2udsu492.bhagwan.userData'
     );
+    console.log(data1);
+    /*   Auth.currentUserInfo()
+      .then((data) => {
+        localStorage.setItem('myData', data.username);
+        this.setState({ username1: data.username });
+        console.log('result: ', data.username);
+      })
+      .catch((err) => console.log(err));
+    console.log(this.state.username1); */
     const {
-      title,
-      language,
       shortDescription,
       longDescription,
       category,
@@ -173,12 +137,8 @@ class VodUpload extends Component {
       videoFile,
       videoType,
       imageFiles,
-      publishAsset,
     } = this.state;
 
-    if (title === '') {
-      this.setState({ titleError: true });
-    }
     if (shortDescription === '') {
       this.setState({ shortDescriptionError: true });
     }
@@ -203,7 +163,6 @@ class VodUpload extends Component {
       });
     }
     if (
-      title !== '' &&
       shortDescription !== '' &&
       longDescription !== '' &&
       category !== '' &&
@@ -223,6 +182,7 @@ class VodUpload extends Component {
       //updated Image name
       let imageCurrentDateTime =
         imageNameStr + currentDatetime + '.' + imageNameType;
+      console.log(imageCurrentDateTime);
       //updated Video name
       let videoCurrentDateTime =
         videoNameStr + currentDatetime + '.' + videoNameType;
@@ -230,8 +190,6 @@ class VodUpload extends Component {
       var createFileName = 'jsonuploader/jsonFile-' + videoNameStr + '.json';
       //Creating JSON object
       let jsonData = JSON.stringify({
-        title: title,
-        language: language,
         shortDescription: shortDescription,
         longDescription: longDescription,
         category: category,
@@ -240,7 +198,6 @@ class VodUpload extends Component {
         imageName: imageName,
         updatedVideoName: videoCurrentDateTime,
         updatedImageName: imageCurrentDateTime,
-        currentDateTime: currentDatetime,
       });
 
       //Json upload
@@ -339,41 +296,12 @@ class VodUpload extends Component {
             <Button variant='primary' onClick={this.backToDashboard}>
               Back
             </Button>
-            <h3>VOD UPLOAD</h3>
+            <h3>LIVE EVENT UPLOAD</h3>
             <Form
               validated={this.state.validated}
               onSubmit={this.uploadAssetData}
               id='dataForm'
             >
-              <Form.Row>
-                <Form.Group as={Col}>
-                  <Form.Label>Ttile</Form.Label>
-                  <Form.Control
-                    type='text'
-                    name='language'
-                    placeholder='Title'
-                    onChange={this.handleChangeValue}
-                    autoComplete='off'
-                    required
-                  />
-                  {this.state.titleError ? (
-                    <span style={{ color: 'red' }}>Please Enter Title</span>
-                  ) : (
-                    ''
-                  )}
-                </Form.Group>
-                <Form.Group as={Col}>
-                  <Form.Label>Language</Form.Label>
-                  <Form.Control
-                    type='text'
-                    name='language'
-                    placeholder='language'
-                    onChange={this.handleChangeValue}
-                    autoComplete='off'
-                  />
-                </Form.Group>
-              </Form.Row>
-
               <Form.Row>
                 <Form.Group as={Col}>
                   <Form.Label>short Description</Form.Label>
@@ -504,16 +432,6 @@ class VodUpload extends Component {
                   )}
                 </Form.Group>
               </Form.Row>
-              <Form.Row>
-                <Form.Group as={Col}>
-                  <Form.Check
-                    type='checkbox'
-                    name='publishAsset'
-                    label='Publish Asset'
-                    onChange={this.handleChangeValue}
-                  />
-                </Form.Group>
-              </Form.Row>
               {this.state.toster && (
                 <ToastContainer
                   position='top-right'
@@ -527,8 +445,6 @@ class VodUpload extends Component {
                   pauseOnHover
                 />
               )}
-
-              {/*  {this.state.toster && <Toster />} */}
               <Button variant='primary' onClick={this.uploadAssetData}>
                 Submit
               </Button>
@@ -539,4 +455,5 @@ class VodUpload extends Component {
     );
   }
 }
-export default withRouter(VodUpload);
+
+export default withRouter(LiveEventUpload);
