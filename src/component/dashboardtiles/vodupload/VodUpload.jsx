@@ -39,19 +39,17 @@ class VodUpload extends Component {
       username1: '',
     };
   }
-  componentDidMount() {
+  /*  componentDidMount() {
     const getUserInformation = JSON.parse(
       localStorage.getItem(
         'CognitoIdentityServiceProvider.6475s2l40uo1i659uq0dbt6tf6.bp1.userData'
       )
     );
     console.log(getUserInformation.Username);
-  }
+  } */
   //Handle onchange event
   handleChangeValue = (event) => {
-    console.log(event.target.checked);
-    return false;
-    if (event.target.title === 'title') {
+    if (event.target.name === 'title') {
       if (event.target.value === '' || event.target.value === null) {
         this.setState({
           titleError: true,
@@ -63,19 +61,25 @@ class VodUpload extends Component {
         });
       }
     }
-    if (event.target.title === 'title') {
+    if (event.target.name === 'language') {
       this.setState({
-        title: event.target.value,
+        language: event.target.value,
       });
     }
-    if (event.target.publishAsset === 'publishAsset') {
-      let isChecked = event.target.checked;
-      console.log(isChecked);
+    if (event.target.name === 'publishAsset') {
+      let publishChecked = event.target.checked;
+      alert(publishChecked);
+      let publishAssetsValue;
+      if (publishChecked) {
+        publishAssetsValue = 'active';
+      } else {
+        publishAssetsValue = 'inactive';
+      }
+      alert(publishAssetsValue);
       this.setState({
-        publishAsset: event.target.value,
+        publishAsset: publishAssetsValue,
       });
     }
-
     if (event.target.name === 'shortDescription') {
       if (event.target.value === '' || event.target.value === null) {
         this.setState({
@@ -159,8 +163,13 @@ class VodUpload extends Component {
   //Submit Form
   uploadAssetData = (e) => {
     //Get Current User Login Information
-    var data1 = localStorage.getItem(
+    /*  var data1 = localStorage.getItem(
       'CognitoIdentityServiceProvider.1gqmvf15e1ljdu60go2udsu492.bhagwan.userData'
+    ); */
+    const getUserInformation = JSON.parse(
+      localStorage.getItem(
+        'CognitoIdentityServiceProvider.6475s2l40uo1i659uq0dbt6tf6.bp1.userData'
+      )
     );
     const {
       title,
@@ -241,6 +250,8 @@ class VodUpload extends Component {
         updatedVideoName: videoCurrentDateTime,
         updatedImageName: imageCurrentDateTime,
         currentDateTime: currentDatetime,
+        loginUserName: getUserInformation.Username,
+        publishAsset: publishAsset,
       });
 
       //Json upload
@@ -350,7 +361,7 @@ class VodUpload extends Component {
                   <Form.Label>Ttile</Form.Label>
                   <Form.Control
                     type='text'
-                    name='language'
+                    name='title'
                     placeholder='Title'
                     onChange={this.handleChangeValue}
                     autoComplete='off'
