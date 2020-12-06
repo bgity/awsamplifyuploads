@@ -10,7 +10,7 @@ class VodUpload extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      publishAsset: '',
+      publishAsset: 'inactive',
       title: '',
       language: '',
       videoName: '',
@@ -68,17 +68,11 @@ class VodUpload extends Component {
     }
     if (event.target.name === 'publishAsset') {
       let publishChecked = event.target.checked;
-      alert(publishChecked);
-      let publishAssetsValue;
       if (publishChecked) {
-        publishAssetsValue = 'active';
-      } else {
-        publishAssetsValue = 'inactive';
+        this.setState({
+          publishAsset: 'active',
+        });
       }
-      alert(publishAssetsValue);
-      this.setState({
-        publishAsset: publishAssetsValue,
-      });
     }
     if (event.target.name === 'shortDescription') {
       if (event.target.value === '' || event.target.value === null) {
